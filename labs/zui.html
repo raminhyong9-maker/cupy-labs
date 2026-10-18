@@ -175,9 +175,9 @@ function flyTo(id, opts = {}) {
   else if (!far) tween(to, 620);
   else {
     const out = { x:(cam.x+to.x)/2, y:(cam.y+to.y)/2, scale:Math.min(cam.scale,to.scale)*.55 };
-    tween(out, 560);
-    setTimeout(() => tween({ x:to.x, y:to.y, scale:out.scale }, 520), reduce ? 0 : 540);
-    setTimeout(() => tween(to, 620), reduce ? 0 : 1080);
+    tween(out, 480);
+    setTimeout(() => tween({ x:to.x, y:to.y, scale:out.scale }, 460), reduce ? 0 : 460);
+    setTimeout(() => tween(to, 520), reduce ? 0 : 920);
   }
   try { history.replaceState(null,'','#'+id); } catch {}
   try { localStorage.setItem('cupy-labs:last', id); } catch {}
