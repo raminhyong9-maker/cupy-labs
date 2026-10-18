@@ -1,0 +1,66 @@
+{
+  "updated": "2026-10-18",
+  "note": "คอลเลกชันเทมเพลตหน้าเว็บ — ทุกไฟล์ใช้ข้อมูลตัวอย่างชุดเดียวกัน (hero + 3 สถิติ + 4 รายการ) เพื่อเทียบสไตล์ได้ตรงกัน",
+  "templates": [
+    {
+      "id": "aurora-glass",
+      "name": "Aurora Glass",
+      "thai": "กระจกเมทัลม่วง",
+      "file": "aurora-glass.html",
+      "tags": ["dark", "glass", "premium"],
+      "motion": ["sheen sweep", "tilt 3D", "reveal"],
+      "tokens": { "bg": "#07040E", "ink": "#F6F1FF", "accent": "#8B5CF6" },
+      "bestFor": "แอพ/แดชบอร์ดที่ต้องการความพรีเมียม · ใช้จริงใน smart-worksheet"
+    },
+    {
+      "id": "paper-editorial",
+      "name": "Paper Editorial",
+      "thai": "กระดาษ บทความ",
+      "file": "paper-editorial.html",
+      "tags": ["light", "serif", "calm"],
+      "motion": ["parallax", "reveal"],
+      "tokens": { "bg": "#F6F1E7", "ink": "#1C1917", "accent": "#9A3412" },
+      "bestFor": "บล็อก/บทความ/รายงาน · อ่านยาวสบายตา"
+    },
+    {
+      "id": "swiss-grid",
+      "name": "Swiss Grid",
+      "thai": "สวิส กริด",
+      "file": "swiss-grid.html",
+      "tags": ["light", "grid", "typographic"],
+      "motion": ["stagger", "underline"],
+      "tokens": { "bg": "#FFFFFF", "ink": "#0A0A0A", "accent": "#E11D48" },
+      "bestFor": "พอร์ตโฟลิโอ/หน่วยงาน · ข้อมูลชัด ลำดับชัด"
+    },
+    {
+      "id": "brutal-pop",
+      "name": "Brutal Pop",
+      "thai": "บรูทัล สีสด",
+      "file": "brutal-pop.html",
+      "tags": ["bold", "playful", "high-contrast"],
+      "motion": ["magnetic", "stagger"],
+      "tokens": { "bg": "#FDE68A", "ink": "#111111", "accent": "#2563EB" },
+      "bestFor": "กิจกรรม/แคมเปญ · ต้องสะดุดตา"
+    },
+    {
+      "id": "pastel-soft",
+      "name": "Pastel Soft",
+      "thai": "พาสเทลนุ่ม",
+      "file": "pastel-soft.html",
+      "tags": ["pastel", "soft-3d", "friendly"],
+      "motion": ["spring hover", "reveal"],
+      "tokens": { "bg": "#EEF2FF", "ink": "#312E81", "accent": "#8B5CF6" },
+      "bestFor": "งานเด็ก/การศึกษา · เข้าถึงง่าย"
+    },
+    {
+      "id": "kinetic-type",
+      "name": "Kinetic Type",
+      "thai": "ตัวอักษรเคลื่อน",
+      "file": "kinetic-type.html",
+      "tags": ["dark", "typographic", "bold"],
+      "motion": ["marquee", "scroll scale", "reveal"],
+      "tokens": { "bg": "#0A0A0A", "ink": "#FAFAFA", "accent": "#22D3EE" },
+      "bestFor": "เปิดตัวผลิตภัณฑ์/อีเวนต์ · เน้นข้อความสั้น"
+    }
+  ]
+}

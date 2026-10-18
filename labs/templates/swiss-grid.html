@@ -1,0 +1,57 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Swiss Grid · Template</title>
+<style>
+:root{--bg:#fff;--ink:#0A0A0A;--muted:#6B7280;--line:#E5E7EB;--accent:#E11D48;--ease:cubic-bezier(.32,.72,0,1)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);padding:0 22px 70px;
+ font:16px/1.6 "Helvetica Neue",Inter,system-ui,"Sarabun",sans-serif}
+a{color:inherit}
+.bar{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:20px 0;border-bottom:1px solid var(--ink)}
+.brand{font-weight:700;letter-spacing:-.4px;text-decoration:none}
+nav{margin-left:auto;display:flex;gap:20px;font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+main{max-width:1080px;margin:0 auto}
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:30px;padding:54px 0 34px;align-items:end}
+h1{font-size:clamp(38px,6.4vw,74px);line-height:.95;letter-spacing:-2.4px;margin:0;font-weight:800}
+.hero p{margin:0;color:var(--muted);font-size:15px;max-width:34ch}
+.btn{display:inline-block;margin-top:16px;padding:12px 18px;background:var(--ink);color:#fff;text-decoration:none;
+ font-size:13px;text-transform:uppercase;letter-spacing:.12em;transition:background .2s var(--ease)}
+.btn:hover{background:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));border-top:1px solid var(--line)}
+.stat{padding:20px 0 18px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:0}
+.stat b{display:block;font-size:40px;letter-spacing:-1.6px;font-weight:700}
+.stat span{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.rows{margin-top:36px;border-top:1px solid var(--ink)}
+.row{display:grid;grid-template-columns:44px 1fr auto auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.row .n{font-size:12px;color:var(--muted);letter-spacing:.1em}
+.row .t{font-weight:600}
+.row .m{font-size:13px;color:var(--muted)}
+.row .s{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+[data-reveal]{opacity:0;transform:translateY(10px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+[data-reveal].in{opacity:1;transform:none}
+@media(max-width:720px){.hero{grid-template-columns:1fr}.row{grid-template-columns:34px 1fr auto}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<header class="bar"><a class="brand" href="/lab/templates">Swiss Grid</a>
+<nav><span>Work</span><span>Studio</span><span>Contact</span></nav></header>
+<main>
+  <section class="hero">
+    <h1>ใบงาน<br/>ที่เป็น<br/>ระเบียบ</h1>
+    <div><p>กริดเข้ม เส้นบาง ตัวอักษรใหญ่ — เทมเพลตสำหรับงานที่ต้องดู “แม่นและจริงจัง”</p><a class="btn" href="#">ดูตัวอย่าง</a></div>
+  </section>
+  <section class="grid">
+    <div class="stat" data-reveal><b>24</b><span>ใบงาน</span></div>
+    <div class="stat" data-reveal><b>86%</b><span>ส่งตรงเวลา</span></div>
+    <div class="stat" data-reveal><b>4</b><span>ห้องที่ใช้</span></div>
+  </section>
+  <section class="rows">
+    <div class="row" data-reveal><span class="n">01</span><span class="t">ใบงานคำนาม</span><span class="m">ป.6</span><span class="s">เผยแพร่</span></div>
+    <div class="row" data-reveal><span class="n">02</span><span class="t">ใบงานคำกริยา</span><span class="m">ป.6</span><span class="s">เผยแพร่</span></div>
+    <div class="row" data-reveal><span class="n">03</span><span class="t">อ่านจับใจความ</span><span class="m">ม.1</span><span class="s">ร่าง</span></div>
+  </section>
+</main>
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.2});
+document.querySelectorAll('[data-reveal]').forEach((el,i)=>{el.style.transitionDelay=(i*60)+'ms';io.observe(el)});
+</script></body></html>

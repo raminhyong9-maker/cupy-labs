@@ -1,0 +1,61 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Paper Editorial · Template</title>
+<style>
+:root{--bg:#F7F3EA;--ink:#1C1917;--muted:#78716C;--line:#E0D8C8;--accent:#9A3412;--ease:cubic-bezier(.32,.72,0,1)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);padding:0 20px 70px;
+ font:16px/1.7 "Iowan Old Style",Georgia,"Sarabun",serif}
+a{color:inherit}
+.bar{max-width:960px;margin:0 auto;padding:22px 0;display:flex;align-items:baseline;gap:18px;border-bottom:1px solid var(--line)}
+.brand{font-weight:700;letter-spacing:-.3px;text-decoration:none;font-size:17px}
+nav{margin-left:auto;display:flex;gap:18px;font-size:14px;color:var(--muted);font-family:system-ui,sans-serif}
+main{max-width:960px;margin:0 auto}
+.hero{padding:56px 0 26px;max-width:52ch}
+.kicker{font-family:system-ui,sans-serif;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.06;margin:0 0 16px;letter-spacing:-1.2px;font-weight:600}
+.hero p{color:#44403C;margin:0 0 24px;font-size:18px}
+.btn{display:inline-block;padding:12px 20px;border:1px solid var(--ink);text-decoration:none;font-family:system-ui,sans-serif;
+ font-size:14px;font-weight:600;transition:background .25s var(--ease),color .25s var(--ease)}
+.btn:hover{background:var(--ink);color:var(--bg)}
+.rule{height:1px;background:var(--line);margin:36px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px;font-family:system-ui,sans-serif}
+.stat b{display:block;font-size:34px;font-weight:600;letter-spacing:-1px}
+.stat span{color:var(--muted);font-size:13px}
+.rows{margin-top:34px;display:grid;gap:0}
+.row{display:flex;align-items:baseline;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.row .n{font-family:system-ui,sans-serif;font-size:12px;color:var(--muted);width:26px}
+.row .t{font-size:19px}
+.row .m{color:var(--muted);font-size:13px;font-family:system-ui,sans-serif}
+.row .chip{margin-left:auto;font-family:system-ui,sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.pull{margin:40px 0 0;padding-left:18px;border-left:2px solid var(--accent);color:#57534E;font-style:italic}
+[data-reveal]{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease),transform .8s var(--ease)}
+[data-reveal].in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<header class="bar"><a class="brand" href="/lab/templates">Paper Editorial</a>
+<nav><span>บทความ</span><span>รายงาน</span><span>เกี่ยวกับ</span></nav></header>
+<main>
+  <section class="hero">
+    <div class="kicker">เทมเพลต · อ่านสบาย</div>
+    <h1>ห้องเรียนที่<br/>วัดผลได้จริง</h1>
+    <p>สไตล์กระดาษ ตัวอักษรเซริฟ ระยะห่างเยอะ — เหมาะกับรายงานและบันทึกงานประกันคุณภาพ</p>
+    <a class="btn" href="#">อ่านรายงานฉบับเต็ม</a>
+  </section>
+  <div class="rule"></div>
+  <section class="stats">
+    <div class="stat" data-reveal><b>24</b><span>ใบงานในภาคเรียน</span></div>
+    <div class="stat" data-reveal><b>86%</b><span>นักเรียนส่งตรงเวลา</span></div>
+    <div class="stat" data-reveal><b>+1.2</b><span>คะแนนเฉลี่ยที่เพิ่มขึ้น</span></div>
+  </section>
+  <section class="rows">
+    <div class="row" data-reveal><span class="n">01</span><div><div class="t">ใบงานคำนาม</div><div class="m">ภาษาไทย · ป.6</div></div><span class="chip">เผยแพร่แล้ว</span></div>
+    <div class="row" data-reveal><span class="n">02</span><div><div class="t">ใบงานคำกริยา</div><div class="m">ภาษาไทย · ป.6</div></div><span class="chip">เผยแพร่แล้ว</span></div>
+    <div class="row" data-reveal><span class="n">03</span><div><div class="t">แบบฝึกอ่านจับใจความ</div><div class="m">ภาษาไทย · ม.1</div></div><span class="chip">ฉบับร่าง</span></div>
+  </section>
+  <p class="pull" data-reveal>“การวัดผลที่ดี คือการทำให้ครูเห็นภาพรวมได้ในไม่กี่วินาที”</p>
+</main>
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('[data-reveal]').forEach((el,i)=>{el.style.transitionDelay=(i*80)+'ms';io.observe(el)});
+</script></body></html>

@@ -1,0 +1,67 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Pastel Soft · Template</title>
+<style>
+:root{--bg:#EEF2FF;--ink:#312E81;--muted:#6366A8;--card:#FFFFFF;--accent:#8B5CF6;--ease:cubic-bezier(.32,.72,0,1)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);padding:22px 18px 70px;
+ font:16px/1.65 system-ui,-apple-system,"Sarabun","Noto Sans Thai",sans-serif;
+ background:
+  radial-gradient(60% 40% at 12% 0%,#FDE7F3 0%,rgba(253,231,243,0) 60%),
+  radial-gradient(60% 40% at 90% 8%,#DFF7F1 0%,rgba(223,247,241,0) 60%),
+  var(--bg)}
+a{color:inherit}
+.bar{max-width:980px;margin:0 auto 26px;display:flex;align-items:center;gap:12px;background:#fff;border-radius:22px;
+ padding:12px 18px;box-shadow:0 18px 40px -26px rgba(49,46,129,.45)}
+.brand{font-weight:800;text-decoration:none;letter-spacing:-.3px}
+.brand i{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:12px;margin-right:8px;font-style:normal;
+ background:linear-gradient(145deg,#C7D2FE,#8B5CF6);color:#fff;font-size:12px;vertical-align:-9px}
+nav{margin-left:auto;display:flex;gap:16px;font-size:14px;color:var(--muted)}
+main{max-width:980px;margin:0 auto}
+.hero{background:#fff;border-radius:28px;padding:34px 28px;box-shadow:0 26px 60px -34px rgba(49,46,129,.5);margin-bottom:20px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.12;margin:0 0 12px;letter-spacing:-.8px}
+.hero p{color:var(--muted);margin:0 0 20px;max-width:54ch}
+.btn{display:inline-block;padding:13px 22px;border-radius:999px;text-decoration:none;font-weight:700;color:#fff;
+ background:linear-gradient(145deg,#A78BFA,#7C3AED);box-shadow:0 16px 30px -16px rgba(124,58,237,.65);
+ transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.btn:hover{transform:translateY(-2px) scale(1.02)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:20px}
+.card{background:#fff;border-radius:22px;padding:18px;box-shadow:0 16px 36px -26px rgba(49,46,129,.5);
+ transition:transform .35s var(--ease)}
+.card:hover{transform:translateY(-4px) scale(1.015)}
+.card b{display:block;font-size:30px;letter-spacing:-.8px;color:#4338CA}
+.card span{color:var(--muted);font-size:13px}
+.rows{display:grid;gap:12px}
+.row{display:flex;align-items:center;gap:12px;background:#fff;border-radius:20px;padding:15px 18px;
+ box-shadow:0 14px 30px -24px rgba(49,46,129,.5)}
+.row .t{font-weight:700}
+.row .m{color:var(--muted);font-size:13px}
+.row .chip{margin-left:auto;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;
+ background:#DCFCE7;color:#166534}
+[data-reveal]{opacity:0;transform:translateY(18px) scale(.99);transition:opacity .5s var(--ease),transform .55s var(--ease)}
+[data-reveal].in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body>
+<header class="bar"><a class="brand" href="/lab/templates"><i>SW</i>Pastel Soft</a>
+<nav><span>ใบงาน</span><span>นักเรียน</span><span>ช่วยเหลือ</span></nav></header>
+<main>
+  <section class="hero">
+    <h1>เรียนภาษาไทย<br/>ให้เบาและสนุก</h1>
+    <p>พาสเทล มุมโค้งใหญ่ เงานุ่ม — เหมาะกับงานที่อยากให้เด็กรู้สึกเป็นมิตร ไม่กดดัน</p>
+    <a class="btn" href="#">ลองทำใบงาน</a>
+  </section>
+  <section class="grid">
+    <div class="card" data-reveal><b>24</b><span>ใบงานทั้งหมด</span></div>
+    <div class="card" data-reveal><b>86%</b><span>ส่งตรงเวลา</span></div>
+    <div class="card" data-reveal><b>4</b><span>ห้องเรียน</span></div>
+  </section>
+  <section class="rows">
+    <div class="row" data-reveal><div><div class="t">ใบงานคำนาม</div><div class="m">ภาษาไทย · ป.6</div></div><span class="chip">เผยแพร่แล้ว</span></div>
+    <div class="row" data-reveal><div><div class="t">ใบงานคำกริยา</div><div class="m">ภาษาไทย · ป.6</div></div><span class="chip">เผยแพร่แล้ว</span></div>
+    <div class="row" data-reveal><div><div class="t">อ่านจับใจความ</div><div class="m">ภาษาไทย · ม.1</div></div><span class="chip">ฉบับร่าง</span></div>
+  </section>
+</main>
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('[data-reveal]').forEach((el,i)=>{el.style.transitionDelay=(i*80)+'ms';io.observe(el)});
+</script></body></html>
