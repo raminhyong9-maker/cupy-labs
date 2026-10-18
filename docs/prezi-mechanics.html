@@ -1,0 +1,139 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>prezi-mechanics</title>
+<style>body{max-width:820px;margin:0 auto;padding:24px 18px 60px;font:16px/1.65 system-ui,"Sarabun",sans-serif;
+background:#F4EEE3;color:#17130E}pre{background:#FFFCF6;border:1px solid rgba(23,19,14,.12);padding:12px;border-radius:12px;overflow:auto}
+code{font-family:ui-monospace,monospace;font-size:.92em}table{border-collapse:collapse;width:100%;margin:10px 0}
+td,th{border-bottom:1px solid rgba(23,19,14,.12);padding:8px;text-align:left;font-size:14px}a{color:#C8452A}</style>
+</head><body><p><a href="../index.html">← Cupy Labs</a></p><h1>กลไก Prezi — บันทึกเชิงเทคนิค</h1>
+
+<p>&gt; วัดจาก Prezi viewer รุ่น <code>viewer-container.0.2.1955</code> · ตัวอย่าง <code>prezi.com/p/xmpasupfkavr/embed/?autoplay=1</code></p>
+<p>&gt; อ้างอิงผล REA: <code>evidence/rea-analysis.json</code> (evidence <code>ev_4144a6d2…</code>)</p>
+
+<p>---</p>
+
+<h2>1. สถาปัตยกรรม</h2>
+
+<table><tr><th>องค์ประกอบ</th><th>ค่าที่วัดได้</th></tr>
+<tr><th>คอนเทนเนอร์</th><th>`#webgl-viewer-app` · `.next-webgl-viewer-container` · `.webgl-viewer-ui-container`</th></tr>
+<tr><th>ผิวเรนเดอร์</th><th>`&lt;canvas&gt;` 1 ใบ **1440×866** (เต็ม viewport)</th></tr>
+<tr><th>คอนเทกซ์</th><th>`WebGL2RenderingContext` — `getParameter(VERSION)` = *WebGL 2.0 (OpenGL ES 3.0)*</th></tr>
+<tr><th>เฟรมเรต</th><th>60 rAF/s (นับ callback 2 วินาที)</th></tr>
+<tr><th>DOM ตอนเล่น</th><th>~1,300 elements แต่ **ไม่มีเนื้อหา** อยู่ใน DOM</th></tr>
+<tr><th>สถาปัตยกรรมแอป</th><th>React 17 + webpack chunks (ไม่ใช่ Electron — REA พบ IPC/browser-window = 0)</th></tr>
+
+<p><b>นัยสำคัญ:</b> ข้อความ การ์ด รูป ทุกอย่างถูก bake เป็น texture แล้ววาดเป็น quad ในฉากเดียว → ซูมได้ไม่จำกัดโดยไม่เสีย layout, แต่แลกด้วยการค้นหา/คัดลอก/เข้าถึงด้วย screen reader ที่ทำไม่ได้</p>
+
+<p>---</p>
+
+<h2>2. รูปแบบข้อมูล</h2>
+
+<pre><code>
+GET https://rosetta0701.prezi.com/presentation/&lt;oid&gt;/
+    → 200 application/json
+      { header: &quot;MAC id=…, ts=…, nonce=…, ext=…, mac=…&quot;,
+        method: &quot;GET&quot;, url: &quot;https://0701.static.prezi.com/presentation/&lt;oid&gt;/&quot;,
+        name: &quot;readpresentationtoken&quot; }
+
+GET &lt;url ข้างบน&gt;  พร้อม header  authorization: MAC …
+    → binary · magic 00 00 00 04 + zlib stream · Content-Type: application/xml (หลอก)
+    → ตัวอย่างที่วัดได้ 36,872 ไบต์
+</code></pre>
+
+<p>- ชื่อ request header <code>X-PdomVersion</code> → เนื้อหาเป็น <b>PDOM</b> (Prezi Document Object Model) แบบไบนารี ไม่ใช่ JSON</p>
+<p>- เรียก endpoint ตรง ๆ ด้วย curl → <b>401 Authentication is possible but has failed</b> (ต้องมี MAC token ราย request) — รีโปนี้ไม่พยายามฝ่า</p>
+
+<p>---</p>
+
+<h2>3. โมเดลการนำทาง</h2>
+
+<p>จาก enum ใน <code>webgl-viewer-app.chunk.js</code>:</p>
+
+<pre><code>
+None · Pan · Zoom
+StepNextKeyboard · StepPreviousKeyboard · GoUpKeyboard
+VideoPlayEmbedded · VideoPlayYoutube · VideoPlayVimeo
+ClickToObject · SnapToObject
+Topic · Subtopic · Animation
+ZoomArea · TopicZoomArea · Baseline · Thumbnail · Ppt · Multiple
+</code></pre>
+
+<p>API ของ navigator ที่มีอยู่จริง:</p>
+
+<pre><code>
+goToNext() · goToPrevious() · goToStart() · goToEnd()
+goToNavigablePathIndex(i)   ← ลำดับเป็น &quot;เส้นทาง&quot; ไม่ใช่ดัชนีสไลด์
+goToOverview() · zoomIn() · zoomOut() · goUp()
+</code></pre>
+
+<p>ชนิดออบเจกต์ (20): <code>Topic · Subtopic · Text · Chart · Image · Video · Shape · Arrow · Symbol · Pdf · Line · TextSnippet · Url · Background · Animation · ZoomArea · Thumbnail · Baseline · TopicZoomArea · Ppt</code></p>
+
+<p><b>อ่านความหมาย:</b> <code>goUp()</code> + <code>Topic → Subtopic</code> = <b>semantic zoom</b> (ถอยออกไปชั้นแม่ของเนื้อหา) ไม่ใช่แค่ย่อขนาด — จุดนี้คือสิ่งที่ต่างจากสไลด์โชว์ทั่วไป</p>
+
+<p>---</p>
+
+<h2>4. คณิตศาสตร์กล้อง</h2>
+
+<pre><code>
+// world → screen
+screenX = (worldX - cam.x) * cam.scale + vw / 2
+screenY = (worldY - cam.y) * cam.scale + vh / 2
+
+// fit กรอบ (x, y, w, h) โดยเหลือขอบ p
+scale = min(vw / (w * (1 + 2p)), vh / (h * (1 + 2p)))
+cam   = { x: x + w/2, y: y + h/2, scale }
+
+// ซูมที่ตำแหน่งเมาส์
+wx = (mx - vw/2) / cam.scale + cam.x
+cam.x = wx - (mx - vw/2) / newScale      // เช่นเดียวกันกับแกน y
+</code></pre>
+
+<p><b>วิถี 3 ช่วง (แบบที่ Prezi ใช้ และวัดได้จากภาพ)</b></p>
+
+<tr><th>ช่วง</th><th>สิ่งที่เกิด</th><th>หลัก</th></tr>
+<tr><th>0–35%</th><th>ถอยออก</th><th>`scale → min(from, to) × 0.5`</th></tr>
+<tr><th>35–68%</th><th>เคลื่อน</th><th>x,y ไปยังเป้า สเกลคงที่</th></tr>
+<tr><th>68–100%</th><th>เข้า</th><th>`scale → to`</th></tr>
+
+<p>เวลา ~1.4–2.2 s ตามระยะ (ไกล = นาน) · easing ประมาณ ease-in-out cubic</p>
+
+<p><b>หลักฐาน:</b> กด <code>ArrowRight</code> แล้วเทียบภาพหน้าจอ (resize 360×225, threshold 12/255)</p>
+
+<tr><th>คู่ที่เทียบ</th><th>พิกเซลเปลี่ยน</th></tr>
+<tr><th>ก่อน → 420 ms</th><th>34.7%</th></tr>
+<tr><th>ก่อน → 2 s</th><th>40.5%</th></tr>
+<tr><th>420 ms → 2 s</th><th>44.8%</th></tr>
+
+<p>ภาพที่ 420 ms เป็น <b>มุมกว้าง</b> (เห็นวงเหลือง/กากบาทม่วงรอบกรอบ) → ยืนยันการถอยออกกลางเที่ยวบิน</p>
+
+<p>---</p>
+
+<h2>5. ผลจาก REA (static analysis)</h2>
+
+<tr><th>เมตริก</th><th>ค่า</th></tr>
+<tr><th>ไฟล์ที่วิเคราะห์</th><th>4 (1,551,405 ไบต์)</th></tr>
+<tr><th>AST nodes</th><th>321,225</th></tr>
+<tr><th>graph nodes / edges</th><th>35 / 45</th></tr>
+<tr><th>modules</th><th>4 (IIFE bundle — ไม่มี ESM/CJS boundary)</th></tr>
+<tr><th>Electron IPC / browser windows</th><th>0 / 0</th></tr>
+<tr><th>unknowns ที่ระบบระบุ</th><th>**48**</th></tr>
+<tr><th>parse failures</th><th>0</th></tr>
+
+<p>REA ยืนยันว่าเป็น <b>เว็บแอป React + webpack ล้วน</b> ไม่มีชั้น Electron และไม่สามารถ fingerprint ไลบรารีได้ (โค้ด minify + ไม่มี source map สาธารณะ) — ข้อจำกัดนี้บันทึกไว้ใน <code>docs/EVIDENCE.md</code></p>
+
+<p>---</p>
+
+<h2>6. 2 สิ่งที่ไม่ควรลอก</h2>
+
+<p>1. <b>ถอยออกทุกครั้ง</b> — ในแอปทำงาน (ใบงาน/ฟอร์ม) ทำให้เสียเวลา 0.6–1.2 s ต่อคลิกและเวียนหัว</p>
+<p>   → ถอยออกเฉพาะเมื่อกระโดดไกลกว่า ~1.5 เท่าของ viewport; ระยะใกล้ใช้ซูมตรง 180–260 ms</p>
+<p>2. <b>ยัดเนื้อหาทั้งหมดลง canvas</b> — ค้นหา, คัดลอก, screen reader, SEO ใช้ไม่ได้</p>
+<p>   → ใช้ DOM สำหรับข้อความ + transform layer เดียว (แบบ <code>demo/zui.html</code>) และใช้ WebGL เฉพาะฉากที่จำเป็น</p>
+
+<p>---</p>
+
+<h2>7. ถ้าจะนำไปใช้</h2>
+
+<p>- <b>กรอบ = เป้ากล้อง</b> สำหรับแผนภาพบทเรียน (แผนหน่วย → บท → แบบฝึก)</p>
+<p>- <b><code>goUp()</code></b> = ปุ่ม &quot;ย้อนขึ้นหนึ่งชั้น&quot; ในหน้าบทเรียน</p>
+<p>- <b>แถบความคืบหน้าแบบ path</b> ไม่ใช่เลขหน้า</p>
+<p>- ลำดับทดลอง: เปิด <code>demo/zui.html</code> → ใส่เนื้อหาจริง 1 บท → วัดเวลาถึงเนื้อหา ≤2 s → ค่อยตัดสินใจทำในแอปจริง</p></body></html>

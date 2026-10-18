@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F4EEE3" />
+<title>Cupy Labs — ห้องทดลองของเรา</title>
+<style>
+  :root{--paper:#F4EEE3;--card:#FFFCF6;--ink:#17130E;--muted:#5C5245;--accent:#C8452A;--teal:#0E6E5E;
+        --line:rgba(23,19,14,.12);--ease:cubic-bezier(.32,.72,0,1)}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100dvh;padding:28px 18px 60px;color:var(--ink);background:var(--paper);
+    font:16px/1.55 system-ui,-apple-system,"Sarabun","Noto Sans Thai",sans-serif;
+    background-image:repeating-linear-gradient(0deg,rgba(23,19,14,.032) 0 1px,transparent 1px 32px)}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:clamp(26px,4vw,38px);letter-spacing:-.04em;margin:0 0 6px;font-weight:800}
+  .lead{color:var(--muted);margin:0 0 24px;max-width:60ch}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  a.card{display:flex;flex-direction:column;gap:6px;padding:20px;border-radius:22px;text-decoration:none;color:inherit;
+    background:linear-gradient(168deg,#FFFDF8,#FAF4E8);border:1px solid var(--line);
+    box-shadow:0 1px 0 #fff inset,0 18px 38px -26px rgba(23,19,14,.6);
+    transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+  a.card:hover{transform:translateY(-3px);box-shadow:0 1px 0 #fff inset,0 26px 48px -26px rgba(200,69,42,.45)}
+  .k{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  .card b{font-size:19px;letter-spacing:-.02em}
+  .card span{color:var(--muted);font-size:14px}
+  footer{margin-top:26px;font-size:13px;color:var(--muted)}
+  footer a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cupy Labs</h1>
+  <p class="lead">ห้องทดลองหน้าเว็บของเรา — ทุกชิ้นวัดผลได้ ใช้ในห้องเรียนได้จริง และเปิดดูได้ทันทีจากมือถือ</p>
+
+  <div class="grid">
+    <a class="card" href="labs/zui.html">
+      <span class="k">Lab 01</span>
+      <b>แผนที่บทเรียน (ZUI)</b>
+      <span>แตะกรอบเพื่อซูมเข้าบท · ลากเลื่อนผืน · สองนิ้วซูม · จำตำแหน่งเดิม · แชร์ลิงก์รายบทได้</span>
+    </a>
+    <a class="card" href="labs/templates/index.html">
+      <span class="k">Lab 02</span>
+      <b>เทมเพลต 6 สไตล์</b>
+      <span>Aurora Glass · Paper Editorial · Swiss Grid · Brutal Pop · Pastel Soft · Kinetic Type</span>
+    </a>
+    <a class="card" href="docs/prezi-mechanics.html">
+      <span class="k">Note</span>
+      <b>กลไก Prezi</b>
+      <span>WebGL2 viewer · PDOM + MAC token · enum การนำทาง · สูตรกล้อง</span>
+    </a>
+    <a class="card" href="docs/rea-playbook.html">
+      <span class="k">Playbook</span>
+      <b>ใช้ REA ถอดกลไก</b>
+      <span>คำสั่ง CLI · Evidence workflow · ข้อจำกัดบนแรม 1.9 GB</span>
+    </a>
+  </div>
+
+  <footer>MIT · เขียนเองทั้งหมด ไม่มีโค้ดของบุคคลที่สาม · <a href="https://github.com/raminhyong9-maker/cupy-labs">ซอร์สบน GitHub</a></footer>
+</div>
+</body>
+</html>

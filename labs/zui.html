@@ -4,289 +4,303 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#F4EEE3" />
-<title>ZUI Lab · แคนวาสซูมได้</title>
+<title>แผนที่บทเรียน — Cupy Labs</title>
 <style>
-  :root{
-    --paper:#F4EEE3; --card:#FFFCF6; --ink:#17130E; --muted:#5C5245;
-    --accent:#C8452A; --teal:#0E6E5E; --ochre:#B98A1C; --plum:#6E4A7C;
-    --line:rgba(23,19,14,.12); --ease:cubic-bezier(.32,.72,0,1);
-  }
+  :root{--paper:#F4EEE3;--card:#FFFCF6;--ink:#17130E;--muted:#5C5245;--accent:#C8452A;--teal:#0E6E5E;
+        --ochre:#B98A1C;--plum:#6E4A7C;--line:rgba(23,19,14,.12);--ease:cubic-bezier(.32,.72,0,1)}
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; overflow:hidden; color:var(--ink); font:16px/1.5 system-ui,-apple-system,"Sarabun","Noto Sans Thai",sans-serif;
-    background:
-      radial-gradient(50% 40% at 70% 10%, rgba(200,69,42,.10), transparent 60%),
-      radial-gradient(40% 35% at 10% 80%, rgba(14,110,94,.10), transparent 60%),
-      var(--paper);
-    touch-action:none; user-select:none; -webkit-user-select:none;
-  }
-  #stage{position:fixed; inset:0; overflow:hidden; cursor:grab}
+  html,body{height:100%;margin:0}
+  body{overflow:hidden;color:var(--ink);background:var(--paper);touch-action:none;
+    font:16px/1.5 system-ui,-apple-system,"Sarabun","Noto Sans Thai",sans-serif;
+    -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;
+    background:radial-gradient(50% 40% at 75% 8%,rgba(200,69,42,.10),transparent 60%),
+               radial-gradient(45% 40% at 8% 85%,rgba(14,110,94,.10),transparent 60%)}
+  #stage{position:fixed;inset:0;overflow:hidden;cursor:grab}
   #stage.dragging{cursor:grabbing}
-  #layer{
-    position:absolute; left:0; top:0; width:0; height:0;
-    transform-origin:0 0; will-change:transform;
-  }
-  #grid{
-    position:absolute; left:0; top:0; width:2600px; height:1400px;
-    background-image:
-      linear-gradient(rgba(23,19,14,.055) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(23,19,14,.055) 1px, transparent 1px);
-    background-size:80px 80px;
-    border-radius:24px;
-  }
-  .frame{
-    position:absolute; padding:22px 24px; border-radius:22px;
-    background:linear-gradient(168deg,#FFFDF8, #FAF4E8);
-    border:1px solid var(--line);
-    box-shadow:0 1px 0 #fff inset, 0 20px 44px -26px rgba(23,19,14,.6);
-    cursor:pointer; transition:box-shadow .25s var(--ease), border-color .25s var(--ease);
-  }
-  .frame:hover{border-color:rgba(200,69,42,.45); box-shadow:0 1px 0 #fff inset, 0 26px 50px -24px rgba(200,69,42,.45)}
-  .frame .kicker{font-size:13px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
-  .frame h2{font-size:30px; line-height:1.15; letter-spacing:-.03em; margin:0 0 8px; font-weight:800}
-  .frame p{margin:0; color:var(--muted); font-size:17px; max-width:34ch}
-  .frame .badge{position:absolute; top:-13px; left:18px; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:800;
-    color:#fff8f3; background:var(--accent); box-shadow:0 8px 16px -10px rgba(200,69,42,.9)}
+  #layer{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+  #grid{position:absolute;left:0;top:0;width:2600px;height:1400px;border-radius:24px;
+    background-image:linear-gradient(rgba(23,19,14,.055) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(23,19,14,.055) 1px,transparent 1px);
+    background-size:80px 80px}
+  .frame{position:absolute;padding:22px 24px;border-radius:22px;cursor:pointer;
+    background:linear-gradient(168deg,#FFFDF8,#FAF4E8);border:1px solid var(--line);
+    box-shadow:0 1px 0 #fff inset,0 20px 44px -26px rgba(23,19,14,.6);
+    transition:box-shadow .25s var(--ease),border-color .25s var(--ease)}
+  .frame:hover,.frame:focus-visible{border-color:rgba(200,69,42,.5);outline:none;
+    box-shadow:0 1px 0 #fff inset,0 26px 50px -24px rgba(200,69,42,.45)}
+  .frame .kicker{font-size:13px;font-weight:800;letter-spacing:.1em;color:var(--accent);margin-bottom:6px}
+  .frame h2{font-size:30px;line-height:1.15;letter-spacing:-.03em;margin:0 0 8px;font-weight:800}
+  .frame p{margin:0;color:var(--muted);font-size:17px;max-width:34ch}
+  .frame .badge{position:absolute;top:-13px;left:18px;padding:3px 10px;border-radius:999px;font-size:12px;
+    font-weight:800;color:#fff8f3;background:var(--accent)}
   .f-teal .badge{background:var(--teal)} .f-plum .badge{background:var(--plum)} .f-ochre .badge{background:var(--ochre)}
   .f-teal h2{color:#0b4438} .f-plum h2{color:#4c3157} .f-ochre h2{color:#6f5209}
-  .hintline{position:absolute; height:2px; background:linear-gradient(90deg, rgba(200,69,42,.35), rgba(200,69,42,0)); border-radius:2px; transform-origin:0 50%}
 
-  /* UI */
-  .hud{position:fixed; z-index:10; display:flex; align-items:center; gap:8px}
-  .hud.tl{left:16px; top:16px}
-  .hud.tr{right:16px; top:16px}
-  .hud.bl{left:16px; bottom:16px}
-  .chipbar{display:flex; align-items:center; gap:6px; padding:7px 10px; border-radius:14px; background:rgba(255,252,246,.92);
-    border:1px solid var(--line); box-shadow:0 1px 0 #fff inset, 0 12px 26px -18px rgba(23,19,14,.55); font-size:13.5px; font-weight:700}
-  .chipbar b{font-variant-numeric:tabular-nums}
-  .btn{display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:40px; padding:8px 14px; border-radius:12px;
-    border:1px solid var(--line); background:var(--card); color:var(--ink); font-size:13.5px; font-weight:700; cursor:pointer;
-    box-shadow:0 1px 0 #fff inset; transition:transform .16s var(--ease), background .16s var(--ease)}
+  .hud{position:fixed;z-index:10;display:flex;align-items:center;gap:8px}
+  .hud.tl{left:calc(12px + env(safe-area-inset-left));top:calc(12px + env(safe-area-inset-top))}
+  .hud.tr{right:calc(12px + env(safe-area-inset-right));top:calc(12px + env(safe-area-inset-top))}
+  .hud.bc{left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%)}
+  .pill{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:rgba(255,252,246,.94);
+    border:1px solid var(--line);box-shadow:0 1px 0 #fff inset,0 12px 26px -18px rgba(23,19,14,.55);
+    font-size:13.5px;font-weight:700}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:44px;
+    padding:9px 14px;border-radius:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    font:700 14px/1 inherit;cursor:pointer;box-shadow:0 1px 0 #fff inset;
+    transition:transform .16s var(--ease),background .16s var(--ease)}
+  .btn:hover{background:#fff}
   .btn:active{transform:translateY(1px)}
-  .btn.primary{background:linear-gradient(168deg,#CD4F33,#BD3F26 52%,#8F2B16); color:#FFF8F3; border-color:transparent}
-  .crumbs{display:flex; gap:6px; align-items:center; font-size:13px; color:var(--muted)}
-  .crumbs button{border:0; background:transparent; color:var(--muted); font:inherit; font-weight:700; cursor:pointer; padding:4px 6px; border-radius:8px}
-  .crumbs button:hover{background:rgba(23,19,14,.06); color:var(--ink)}
-  .crumbs .sep{opacity:.45}
-  .legend{font-size:12.5px; color:var(--muted); background:rgba(255,252,246,.9); border:1px solid var(--line);
-    padding:8px 12px; border-radius:12px; max-width:330px; line-height:1.45}
-  @media (max-width:600px){ .legend{display:none} .frame h2{font-size:24px} .frame p{font-size:15px} }
+  .btn.primary{background:linear-gradient(168deg,#CD4F33,#BD3F26 52%,#8F2B16);color:#FFF8F3;border-color:transparent}
+  .btn[disabled]{opacity:.45;cursor:default}
+  .btn svg{width:18px;height:18px}
+  .dots{display:flex;gap:8px;align-items:center}
+  .dots button{width:12px;height:12px;padding:0;border-radius:50%;border:1px solid rgba(23,19,14,.22);
+    background:transparent;cursor:pointer;transition:transform .2s var(--ease),background .2s var(--ease)}
+  .dots button.on{background:var(--accent);border-color:var(--accent);transform:scale(1.35)}
+  .dots button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  #tips{position:fixed;z-index:11;right:calc(12px + env(safe-area-inset-right));bottom:calc(76px + env(safe-area-inset-bottom));
+    width:min(300px,calc(100vw - 24px));padding:14px 16px;border-radius:18px;background:rgba(255,252,246,.98);
+    border:1px solid var(--line);box-shadow:0 24px 48px -24px rgba(23,19,14,.6)}
+  #tips b{display:block;font-size:14.5px;margin-bottom:6px}
+  #tips ul{margin:0 0 10px;padding-left:18px;font-size:13.5px;color:var(--muted);line-height:1.6}
+  #tips .row{display:flex;gap:8px;justify-content:flex-end}
+  @media (max-width:600px){
+    .frame h2{font-size:24px}.frame p{font-size:15px}
+    .hud.tr .btn span{display:none}
+    .hud.tr{gap:6px}
+    .pill{font-size:12.5px;padding:7px 10px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<div id="stage">
-  <div id="layer">
-    <div id="grid"></div>
-  </div>
+<div id="stage" aria-label="ผืนแคนวาสบทเรียน — ลากเพื่อเลื่อน หมุดสองนิ้วเพื่อซูม">
+  <div id="layer"><div id="grid"></div></div>
 </div>
 
 <div class="hud tl">
-  <div class="chipbar">ZUI Lab <span style="opacity:.4">·</span> <span id="scaleTag"><b>100</b>%</span></div>
-  <div class="chipbar crumbs" id="crumbs"></div>
+  <div class="pill"><strong>แผนที่บทเรียน</strong><span style="opacity:.4">·</span><span id="zoomTag">100%</span></div>
 </div>
+
 <div class="hud tr">
-  <button class="btn" id="btnOverview">ภาพรวม</button>
-  <button class="btn primary" id="btnNext">ถัดไป ›</button>
+  <button class="btn" id="up" title="ย้อนขึ้น / ภาพรวม (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg><span>ย้อนขึ้น</span></button>
+  <button class="btn" id="prev" title="บทก่อนหน้า (←)" aria-label="บทก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+  <button class="btn primary" id="next" title="บทถัดไป (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg><span>ถัดไป</span></button>
 </div>
-<div class="hud bl">
-  <div class="legend">เลื่อนเมาส์ = ซูมที่ตำแหน่งเคอร์เซอร์ · ลาก = เลื่อนผืน · คลิกกรอบ = บินเข้า · ลูกศร ←/→ = เปลี่ยนกรอบ · Esc = ถอยออก</div>
+
+<div class="hud bc">
+  <div class="pill"><div class="dots" id="dots" role="tablist" aria-label="บทเรียน"></div></div>
+</div>
+
+<div id="tips" hidden>
+  <b>ใช้ง่าย ๆ แค่ 3 อย่าง</b>
+  <ul>
+    <li><b>แตะกรอบ</b> = ซูมเข้าบทนั้น</li>
+    <li><b>ลากผืน</b> = เลื่อนดูรอบ ๆ</li>
+    <li><b>สองนิ้ว / ล้อเมาส์</b> = ซูม</li>
+  </ul>
+  <div class="row">
+    <button class="btn" id="tipsClose">เข้าใจแล้ว</button>
+  </div>
 </div>
 
 <script>
-/* ─────────────────────────────────────────────────────────────
-   ZUI (Zoomable User Interface) — กลไกแบบ Prezi ย่อส่วน
-   world = 3200×2200 · camera = {x,y,scale} · ทุกกรอบอยู่ในระนาบเดียว
-   ───────────────────────────────────────────────────────────── */
+/* แผนที่บทเรียน (ZUI) — ฉบับใช้งานจริง: แตะได้ · มีทางกลับ · จำตำแหน่งเดิม */
 const stage = document.getElementById('stage');
 const layer = document.getElementById('layer');
-const scaleTag = document.getElementById('scaleTag');
-const crumbs = document.getElementById('crumbs');
+const zoomTag = document.getElementById('zoomTag');
+const dots = document.getElementById('dots');
+const tips = document.getElementById('tips');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const vw = () => innerWidth, vh = () => innerHeight;
 
-const cam = { x: 1050, y: 470, scale: 0.62 };
-const HOME = { x: 1050, y: 470, scale: 0.62 };
-
 const FRAMES = [
-  { id: 'unit',  x: 200,  y: 80,   w: 1700, h: 780, cls: '',        depth: 0,
-    kicker: 'หน่วยการเรียนรู้', title: 'ภาษาไทย · หน่วยที่ 3', desc: 'คำนาม คำกริยา และการอ่านจับใจความ — 6 บทเรียนในผืนเดียว' },
-  { id: 'l1',    x: 250,  y: 180,  w: 460,  h: 280, cls: 'f-teal',  depth: 1,
-    kicker: 'บทที่ 1', title: 'ชนิดของคำนาม', desc: 'สามัญ · วิสามัญ · สมุหนาม · อาการนาม' },
-  { id: 'l2',    x: 760,  y: 180,  w: 460,  h: 280, cls: 'f-plum',  depth: 1,
-    kicker: 'บทที่ 2', title: 'คำกริยาและคำวิเศษณ์', desc: 'แยกกริยาแท้–กริยาช่วย ฝึกแต่งประโยค' },
-  { id: 'l3',    x: 1270, y: 180,  w: 460,  h: 280, cls: 'f-ochre', depth: 1,
-    kicker: 'บทที่ 3', title: 'อ่านจับใจความ', desc: 'หาใจความสำคัญ · ตั้งคำถามจากเรื่อง' },
-  { id: 'l4',    x: 250,  y: 520,  w: 460,  h: 280, cls: '',        depth: 1,
-    kicker: 'บทที่ 4', title: 'สำนวนและคำพังเพย', desc: 'ความหมายตรง–เปรียบ · ใช้ให้ถูกบริบท' },
-  { id: 'l5',    x: 760,  y: 520,  w: 460,  h: 280, cls: 'f-teal',  depth: 1,
-    kicker: 'บทที่ 5', title: 'เขียนย่อความ', desc: 'โครงย่อความ 4 ส่วน · เกณฑ์ให้คะแนน' },
-  { id: 'l6',    x: 1270, y: 520,  w: 460,  h: 280, cls: 'f-plum',  depth: 1,
-    kicker: 'บทที่ 6', title: 'แบบทดสอบท้ายหน่วย', desc: '20 ข้อ · ตรวจอัตโนมัติ · เห็นผลทันที' },
-  { id: 'note',  x: 2020, y: 620,  w: 420,  h: 280, cls: 'f-ochre', depth: 2,
-    kicker: 'ภาคผนวก', title: 'เกณฑ์การให้คะแนน', desc: 'ใช้กับทุกบท · ครูปรับได้รายคน' },
+  { id:'unit', x:200, y:80, w:1700, h:780, cls:'', kicker:'หน่วยการเรียนรู้', title:'ภาษาไทย · หน่วยที่ 3',
+    desc:'คำนาม คำกริยา และการอ่านจับใจความ — 6 บทเรียนในผืนเดียว' },
+  { id:'l1', x:250, y:180, w:460, h:280, cls:'f-teal', kicker:'บทที่ 1', title:'ชนิดของคำนาม', desc:'สามัญ · วิสามัญ · สมุหนาม · อาการนาม' },
+  { id:'l2', x:760, y:180, w:460, h:280, cls:'f-plum', kicker:'บทที่ 2', title:'คำกริยาและคำวิเศษณ์', desc:'แยกกริยาแท้–กริยาช่วย ฝึกแต่งประโยค' },
+  { id:'l3', x:1270, y:180, w:460, h:280, cls:'f-ochre', kicker:'บทที่ 3', title:'อ่านจับใจความ', desc:'หาใจความสำคัญ · ตั้งคำถามจากเรื่อง' },
+  { id:'l4', x:250, y:520, w:460, h:280, cls:'', kicker:'บทที่ 4', title:'สำนวนและคำพังเพย', desc:'ความหมายตรง–เปรียบ · ใช้ให้ถูกบริบท' },
+  { id:'l5', x:760, y:520, w:460, h:280, cls:'f-teal', kicker:'บทที่ 5', title:'เขียนย่อความ', desc:'โครงย่อความ 4 ส่วน · เกณฑ์ให้คะแนน' },
+  { id:'l6', x:1270, y:520, w:460, h:280, cls:'f-plum', kicker:'บทที่ 6', title:'แบบทดสอบท้ายหน่วย', desc:'20 ข้อ · ตรวจอัตโนมัติ · เห็นผลทันที' },
+  { id:'note', x:2020, y:620, w:420, h:280, cls:'f-ochre', kicker:'ภาคผนวก', title:'เกณฑ์การให้คะแนน', desc:'ใช้กับทุกบท · ครูปรับได้รายคน' },
 ];
-
-/* ── สร้างกรอบ */
+const LESSONS = FRAMES.filter(f => f.id.startsWith('l'));
+const HOME = { x:1050, y:470, scale:0.62 };
+const cam = { ...HOME };
 const nodes = new Map();
+
 for (const f of FRAMES) {
   const el = document.createElement('div');
-  el.className = 'frame ' + (f.cls || '');
-  el.style.cssText = `left:${f.x}px; top:${f.y}px; width:${f.w}px; height:${f.h}px`;
+  el.className = 'frame ' + f.cls;
+  el.tabIndex = 0;
+  el.setAttribute('role','button');
+  el.setAttribute('aria-label', f.title);
+  el.style.cssText = `left:${f.x}px;top:${f.y}px;width:${f.w}px;height:${f.h}px`;
   el.innerHTML = `<div class="badge">${f.kicker}</div><h2>${f.title}</h2><p>${f.desc}</p>`;
-  el.addEventListener('click', (e) => { e.stopPropagation(); flyTo(f.id); });
+  el.addEventListener('click', () => flyTo(f.id));
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flyTo(f.id); } });
   layer.appendChild(el);
   nodes.set(f.id, { ...f, el });
 }
 
-/* ── กล้อง */
+const ease = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+const lerp = (a,b,t) => a + (b-a)*t;
 function apply() {
-  layer.style.transform = `translate3d(${(-cam.x * cam.scale + vw() / 2)}px, ${(-cam.y * cam.scale + vh() / 2)}px, 0) scale(${cam.scale})`;
-  scaleTag.innerHTML = `<b>${Math.round(cam.scale * 100)}</b>%`;
+  layer.style.transform = `translate3d(${-cam.x*cam.scale + vw()/2}px,${-cam.y*cam.scale + vh()/2}px,0) scale(${cam.scale})`;
+  zoomTag.textContent = Math.round(cam.scale*100) + '%';
 }
+const fit = (f, pad = .16) => Math.min(vw()/(f.w*(1+2*pad)), vh()/(f.h*(1+2*pad)));
 
-function fitScale(f, pad = 0.16) {
-  return Math.min(vw() / (f.w * (1 + 2 * pad)), vh() / (f.h * (1 + 2 * pad)));
-}
-
-/* ── อนิเมชันกล้อง 3 ช่วง: ถอยออก → เคลื่อน → เข้า */
 let anim = null;
+function tween(to, dur) {
+  cancelAnimationFrame(anim);
+  const from = { ...cam }, t0 = performance.now(), d = reduce ? 0 : dur;
+  const step = () => {
+    const p = d === 0 ? 1 : Math.min(1, (performance.now()-t0)/d), k = ease(p);
+    cam.x = lerp(from.x,to.x,k); cam.y = lerp(from.y,to.y,k); cam.scale = lerp(from.scale,to.scale,k);
+    apply();
+    if (p < 1) anim = requestAnimationFrame(step);
+  };
+  step();
+}
+
 function flyTo(id, opts = {}) {
-  const f = nodes.get(id);
-  if (!f) return;
-  const from = { ...cam };
-  const to = { x: f.x + f.w / 2, y: f.y + f.h / 2, scale: fitScale(f) };
-  const dist = Math.hypot(to.x - from.x, to.y - from.y) * from.scale;
-  const far = dist > Math.max(vw(), vh()) * 0.8;      // ระยะไกล → ถอยออกก่อน
-  const dur = opts.dur ?? (far ? 1900 : 620);
-  const outScale = Math.min(from.scale, to.scale) * (far ? 0.5 : 0.92);
-  const t0 = performance.now();
-
-  anim = () => {
-    const p = Math.min(1, (performance.now() - t0) / dur);
-    if (far) {
-      if (p < 0.35) {                       // 1) ถอยออก
-        const k = ease(p / 0.35);
-        cam.scale = lerp(from.scale, outScale, k);
-        cam.x = lerp(from.x, (from.x + to.x) / 2, k * 0.6);
-        cam.y = lerp(from.y, (from.y + to.y) / 2, k * 0.6);
-      } else if (p < 0.68) {                // 2) เคลื่อน
-        const k = ease((p - 0.35) / 0.33);
-        cam.scale = outScale;
-        cam.x = lerp((from.x + to.x) / 2, to.x, k);
-        cam.y = lerp((from.y + to.y) / 2, to.y, k);
-      } else {                              // 3) เข้า
-        const k = ease((p - 0.68) / 0.32);
-        cam.scale = lerp(outScale, to.scale, k);
-        cam.x = to.x; cam.y = to.y;
-      }
-    } else {                                // ใกล้ → ซูมตรง
-      const k = ease(p);
-      cam.x = lerp(from.x, to.x, k);
-      cam.y = lerp(from.y, to.y, k);
-      cam.scale = lerp(from.scale, to.scale, k);
-    }
-    apply();
-    if (p < 1) requestAnimationFrame(anim);
-    else { anim = null; setCrumbs(f); }
-  };
-  requestAnimationFrame(anim);
-}
-
-const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-const lerp = (a, b, t) => a + (b - a) * t;
-
-function overview() {
-  const from = { ...cam }, to = HOME, dur = 800, t0 = performance.now();
-  anim = () => {
-    const p = Math.min(1, (performance.now() - t0) / dur), k = ease(p);
-    cam.x = lerp(from.x, to.x, k); cam.y = lerp(from.y, to.y, k); cam.scale = lerp(from.scale, to.scale, k);
-    apply();
-    if (p < 1) requestAnimationFrame(anim); else { anim = null; setCrumbs(null); }
-  };
-  requestAnimationFrame(anim);
-}
-
-/* ── breadcrumb (เทียบเท่า goUp() ของ Prezi) */
-function setCrumbs(f) {
-  crumbs.innerHTML = '';
-  const add = (label, fn) => {
-    const b = document.createElement('button');
-    b.textContent = label; b.onclick = fn; crumbs.appendChild(b);
-  };
-  add('ภาพรวม', overview);
-  if (f) {
-    crumbs.insertAdjacentHTML('beforeend', '<span class="sep">›</span>');
-    add(f.kicker.replace('บทที่ ', 'บท '), () => flyTo(f.id));
+  const f = nodes.get(id); if (!f) return;
+  const to = { x:f.x+f.w/2, y:f.y+f.h/2, scale:fit(f) };
+  const dist = Math.hypot(to.x-cam.x, to.y-cam.y) * cam.scale;
+  const far = dist > Math.max(vw(),vh()) * .8;
+  if (opts.instant) { Object.assign(cam, to); apply(); }
+  else if (!far) tween(to, 620);
+  else {
+    const out = { x:(cam.x+to.x)/2, y:(cam.y+to.y)/2, scale:Math.min(cam.scale,to.scale)*.55 };
+    tween(out, 560);
+    setTimeout(() => tween({ x:to.x, y:to.y, scale:out.scale }, 520), reduce ? 0 : 540);
+    setTimeout(() => tween(to, 620), reduce ? 0 : 1080);
   }
+  try { history.replaceState(null,'','#'+id); } catch {}
+  try { localStorage.setItem('cupy-labs:last', id); } catch {}
+  markCurrent(id);
 }
 
-/* ── ซูมที่เคอร์เซอร์ */
-stage.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  if (anim) anim = null;
-  const k = Math.exp(-e.deltaY * 0.0014);
-  const next = Math.min(3.2, Math.max(0.12, cam.scale * k));
-  const mx = e.clientX, my = e.clientY;
-  const wx = (mx - vw() / 2) / cam.scale + cam.x;
-  const wy = (my - vh() / 2) / cam.scale + cam.y;
-  cam.x = wx - (mx - vw() / 2) / next;
-  cam.y = wy - (my - vh() / 2) / next;
-  cam.scale = next;
-  apply();
-}, { passive: false });
+function overview() { tween(HOME, 700); markCurrent(null); try{history.replaceState(null,'',location.pathname);}catch{} }
 
-/* ── ลากผืน + ปล่อยแล้วไถล */
-let drag = null, vel = { x: 0, y: 0 }, glide = 0;
-stage.addEventListener('pointerdown', (e) => {
-  if (e.button !== 0) return;
-  // ยังไม่ capture: ถ้าลากเกิน 4px ค่อยเริ่มลาก (เพื่อให้คลิกกรอบได้)
-  drag = { x: e.clientX, y: e.clientY, cx: cam.x, cy: cam.y, t: performance.now(), moved: false, id: e.pointerId };
-  vel = { x: 0, y: 0 };
-  if (anim) anim = null;
-  cancelAnimationFrame(glide);
+LESSONS.forEach(f => {
+  const b = document.createElement('button');
+  b.type='button'; b.setAttribute('role','tab'); b.setAttribute('aria-label',f.title);
+  b.onclick = () => flyTo(f.id);
+  dots.appendChild(b);
 });
-stage.addEventListener('pointermove', (e) => {
+function markCurrent(id) {
+  const idx = LESSONS.findIndex(f => f.id === id);
+  [...dots.children].forEach((b,i) => { b.classList.toggle('on', i === idx); b.setAttribute('aria-selected', String(i === idx)); });
+  document.getElementById('prev').disabled = idx <= 0;
+  document.getElementById('next').disabled = idx >= LESSONS.length - 1;
+}
+
+const pointers = new Map();
+let drag = null, pinch = null, vel = {x:0,y:0}, glide = 0;
+
+stage.addEventListener('pointerdown', e => {
+  pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  cancelAnimationFrame(anim); cancelAnimationFrame(glide);
+  if (pointers.size === 2) {
+    const [a,b] = [...pointers.values()];
+    pinch = { d: Math.hypot(a.x-b.x,a.y-b.y), scale: cam.scale }; drag = null; return;
+  }
+  drag = { x:e.clientX, y:e.clientY, cx:cam.x, cy:cam.y, t:performance.now(), moved:false, id:e.pointerId };
+  vel = {x:0,y:0};
+});
+
+stage.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+  if (pinch && pointers.size === 2) {
+    const [a,b] = [...pointers.values()];
+    const ratio = Math.hypot(a.x-b.x,a.y-b.y) / pinch.d;
+    const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+    const s = Math.min(3.2, Math.max(.12, pinch.scale * ratio));
+    const wx = (mx-vw()/2)/cam.scale + cam.x, wy = (my-vh()/2)/cam.scale + cam.y;
+    cam.scale = s;
+    cam.x = wx - (mx-vw()/2)/s; cam.y = wy - (my-vh()/2)/s;
+    apply(); return;
+  }
   if (!drag) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-  if (!drag.moved && Math.hypot(dx, dy) > 4) {
-    drag.moved = true;
-    stage.classList.add('dragging');
+  if (!drag.moved && Math.hypot(dx,dy) > 5) {
+    drag.moved = true; stage.classList.add('dragging');
     try { stage.setPointerCapture(drag.id); } catch {}
   }
   if (!drag.moved) return;
-  const dt = Math.max(8, performance.now() - drag.t);
-  vel = { x: -dx / cam.scale / dt, y: -dy / cam.scale / dt };
-  cam.x = drag.cx - dx / cam.scale;
-  cam.y = drag.cy - dy / cam.scale;
+  const dt = Math.max(8, performance.now()-drag.t);
+  vel = { x:-dx/cam.scale/dt, y:-dy/cam.scale/dt };
+  cam.x = drag.cx - dx/cam.scale; cam.y = drag.cy - dy/cam.scale;
   apply();
 });
-stage.addEventListener('pointerup', () => {
+
+function endPointer(e) {
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinch = null;
   stage.classList.remove('dragging');
-  const moved = drag?.moved;
+  if (!drag) return;
+  const moved = drag.moved;
   drag = null;
   if (!moved) return;
-  let vx = vel.x * 16, vy = vel.y * 16;
-  const step = () => {
-    vx *= 0.92; vy *= 0.92;
-    cam.x += vx; cam.y += vy; apply();
-    if (Math.hypot(vx, vy) > 0.4) glide = requestAnimationFrame(step);
-  };
+  let vx = vel.x*16, vy = vel.y*16;
+  const step = () => { vx*=.92; vy*=.92; cam.x+=vx; cam.y+=vy; apply();
+    if (Math.hypot(vx,vy) > .4) glide = requestAnimationFrame(step); };
   glide = requestAnimationFrame(step);
-});
+}
+stage.addEventListener('pointerup', endPointer);
+stage.addEventListener('pointercancel', endPointer);
 
-/* ── คีย์บอร์ด */
-let idx = -1;
-addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') return overview();
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { idx = (idx + 1) % FRAMES.length; flyTo(FRAMES[idx].id); }
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { idx = (idx - 1 + FRAMES.length) % FRAMES.length; flyTo(FRAMES[idx].id); }
+stage.addEventListener('wheel', e => {
+  e.preventDefault();
+  const k = Math.exp(-e.deltaY * .0014);
+  const s = Math.min(3.2, Math.max(.12, cam.scale*k));
+  const mx = e.clientX, my = e.clientY;
+  const wx = (mx-vw()/2)/cam.scale + cam.x, wy = (my-vh()/2)/cam.scale + cam.y;
+  cam.scale = s; cam.x = wx - (mx-vw()/2)/s; cam.y = wy - (my-vh()/2)/s;
+  apply();
+}, { passive:false });
+
+const idxNow = () => LESSONS.findIndex(f => f.id === (location.hash||'').slice(1));
+document.getElementById('next').onclick = () => {
+  const i = idxNow();
+  flyTo(LESSONS[Math.min(LESSONS.length-1, i+1)].id);
+};
+document.getElementById('prev').onclick = () => {
+  const i = idxNow();
+  flyTo(LESSONS[Math.max(0, (i <= 0 ? 1 : i) - 1)].id);
+};
+document.getElementById('up').onclick = overview;
+
+addEventListener('keydown', e => {
+  if (e.key === 'Escape' || e.key === 'Home') return overview();
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); document.getElementById('next').click(); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); document.getElementById('prev').click(); }
+  if (e.key === '+' || e.key === '=') zoomBy(1.25);
+  if (e.key === '-') zoomBy(0.8);
 });
-document.getElementById('btnNext').onclick = () => { idx = (idx + 1) % FRAMES.length; flyTo(FRAMES[idx].id); };
-document.getElementById('btnOverview').onclick = overview;
+function zoomBy(k) {
+  tween({ x:cam.x, y:cam.y, scale: Math.min(3.2, Math.max(.12, cam.scale*k)) }, 220);
+}
+
+const startId = (location.hash||'').slice(1);
+const last = (() => { try { return localStorage.getItem('cupy-labs:last'); } catch { return null; } })();
+if (startId && nodes.has(startId)) flyTo(startId, { instant:true });
+else if (last && nodes.has(last) && !reduce) flyTo(last, { instant:true });
+else { apply(); markCurrent(null); }
+
+try { if (!localStorage.getItem('cupy-labs:tips')) tips.hidden = false; } catch { tips.hidden = false; }
+document.getElementById('tipsClose').onclick = () => {
+  tips.hidden = true;
+  try { localStorage.setItem('cupy-labs:tips','1'); } catch {}
+};
 
 addEventListener('resize', apply);
-apply();
-setCrumbs(null);
 </script>
 </body>
 </html>

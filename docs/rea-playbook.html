@@ -1,0 +1,66 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>rea-playbook</title>
+<style>body{max-width:820px;margin:0 auto;padding:24px 18px 60px;font:16px/1.65 system-ui,"Sarabun",sans-serif;
+background:#F4EEE3;color:#17130E}pre{background:#FFFCF6;border:1px solid rgba(23,19,14,.12);padding:12px;border-radius:12px;overflow:auto}
+code{font-family:ui-monospace,monospace;font-size:.92em}table{border-collapse:collapse;width:100%;margin:10px 0}
+td,th{border-bottom:1px solid rgba(23,19,14,.12);padding:8px;text-align:left;font-size:14px}a{color:#C8452A}</style>
+</head><body><p><a href="../index.html">← Cupy Labs</a></p><h1>REA Playbook — ใช้ REA ถอดกลไกบนเครื่องนี้</h1>
+
+<p>&gt; อัปเดต 18 ต.ค. 2569 · ทดสอบจริงบน Ubuntu 24.04 · Node 26.7.0 · RAM 1.9 GB</p>
+
+<h2>REA คืออะไร</h2>
+
+<p><code>morluto/rea</code> (MIT) — MCP server + CLI สำหรับ reverse engineering: อ่าน <b>shipped artifact</b> (JS bundle, ASAR, APK, binary, firmware) แล้วคืน <b>Evidence</b> ที่อ้างอิงได้ (มี <code>evidence_id</code>, digest, limitations) แทนการเดา</p>
+
+<p>- ใช้เมื่อ: ต้องรู้ว่าของที่ deploy แล้วทำงานอย่างไร, เทียบเวอร์ชัน, decompile, เก็บหลักฐานพฤติกรรม</p>
+<p>- <b>ไม่ใช้</b> เมื่อ: อ่าน source repo ที่มีครบอยู่แล้ว (ใช้ tools ปกติ)</p>
+
+<h2>สถานะบนเครื่องนี้</h2>
+
+<pre><code>
+สกิล:  ~/.hermes/skills/reverse-engineer-anything   (v42, 6 references)
+MCP:   ~/.hermes/config.yaml → mcp_servers.rea = npx -y rea-agents@6.5.0 mcp
+ตรวจ:  hermes mcp test rea   → ✓ Connected · 207 tools
+CLI:   npx -y rea-agents@6.5.0 &lt;command&gt;
+</code></pre>
+
+<h2>ใช้ผ่าน CLI (ไม่ต้องพึ่ง MCP)</h2>
+
+<pre><code>
+# 1) วิเคราะห์ทั้งโฟลเดอร์ (JS/Electron/browser)
+npx -y rea-agents@6.5.0 analyze-javascript-application ./artifacts --json &gt; evidence/rea-analysis.json
+
+# 2) สรุปย่อจาก Evidence (ไม่ต้องอ่าน 2 MB เข้า context)
+node -e &#x27;const d=require(&quot;./evidence/rea-analysis.json&quot;);
+const s=d.normalized_result.statistics, g=d.normalized_result.graph;
+console.log(s, {nodes:g.nodes.length, edges:g.edges.length});&#x27;
+
+# 3) ตรวจความพร้อมของเอนจิน
+npx -y rea-agents@6.5.0 doctor --json
+</code></pre>
+
+<p><b>ตัวเลขจริงที่วัดได้ (โฟลเดอร์ 1.5 MB / 4 ไฟล์):</b> 113–200 วินาที · RAM สูงสุด <b>420 MB</b> · Evidence ~190 KB · AST 321,225 nodes</p>
+
+<h2>กฎการทำงาน</h2>
+
+<p>1. <b>อ่าน Evidence ไม่ใช่ดิบ</b> — <code>--json &gt; file.json</code> เสมอ แล้วค่อยสกัดสรุป (ผลจริงอาจใหญ่หลาย MB)</p>
+<p>2. <b>เก็บ limitations ไว้</b> — REA ระบุ unknowns/ข้อจำกัดตรง ๆ (ตัวอย่าง: 48 unknowns) ห้ามตัดทิ้งเพื่อให้รายงานดูสมบูรณ์</p>
+<p>3. <b>ไม่ฝ่า auth</b> — endpoint ที่ต้องใช้ token ให้บันทึกว่า 401 แล้วหยุด; ใช้เฉพาะสิ่งที่เบราว์เซอร์โหลดตามปกติ</p>
+<p>4. <b>Static ≠ runtime</b> — REA บอกโครงสร้าง/ความสัมพันธ์; พฤติกรรม (fps, การเคลื่อนกล้อง) ต้องวัดด้วย CDP/browser เพิ่ม</p>
+<p>5. <b>Bundle ของบุคคลที่สาม</b> — ศึกษาได้ แต่ <b>อย่า commit โค้ดเขา</b>; commit แค่ hash + สคริปต์ดาวน์โหลด + บทวิเคราะห์ของเรา</p>
+
+<h2>ข้อจำกัดบนเครื่อง RAM 1.9 GB</h2>
+
+<table><tr><th>งาน</th><th>สถานะ</th></tr>
+<tr><th>JavaScript / browser / Electron bundle</th><th>✅ ใช้ได้ (420 MB peak)</th></tr>
+<tr><th>Runtime observation (process/PTY)</th><th>✅ ใช้ได้</th></tr>
+<tr><th>ถอด native (Ghidra / IDA / Hopper)</th><th>❌ ยังไม่มีเอนจิน + แรมไม่พอ</th></tr>
+<tr><th>Android (JADX)</th><th>❌ ต้องมี `REA_JADX_MCP_JAR` เอง</th></tr>
+
+<h2>MCP tools ใน Hermes</h2>
+
+<p>หลังลงทะเบียนแล้ว tool ชุด <code>mcp_rea_*</code> (207 ตัว) จะโผล่ <b>ในเซสชันใหม่</b> เพราะ Hermes ค้นพบ MCP ตอนเริ่มเซสชัน — ถ้าจำเป็นต้องใช้ทันทีในเซสชันเดิม ให้ใช้ CLI ข้างบน</p>
+
+<h2>ตัวอย่างผลลัพธ์ที่ใช้ได้จริง</h2>
+
+<p>ดู [<code>prezi-mechanics.md</code>](prezi-mechanics.md) — งานแกะ Prezi ที่ใช้ทั้ง REA (โครงสร้าง) และ CDP (พฤติกรรม) แล้วประกอบเป็นข้อสรุปเดียว</p></body></html>
